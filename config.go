@@ -12,12 +12,11 @@ type LogReader struct {
 }
 
 type Test struct {
-	MatchPathRegex          regexp.Regexp `yaml:"match_path_regex"`
-	PreTestCommand          string        `yaml:"pre_test_command"`
-	TestAllCommand          string        `yaml:"test_all_command"`
-	TestCommand             string        `yaml:"test_command"`
-	TestCommandSearchPrefix string        `yaml:"test_command_search_prefix"`
-	FailedLogListCommand    string        `yaml:"failed_log_list_command"`
+	MatchPathRegex       regexp.Regexp `yaml:"match_path_regex"`
+	PreTestCommand       string        `yaml:"pre_test_command"`
+	TestAllCommand       string        `yaml:"test_all_command"`
+	TestCommand          string        `yaml:"test_command"`
+	FailedLogListCommand string        `yaml:"failed_log_list_command"`
 }
 
 type Tester struct {
