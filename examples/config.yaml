@@ -16,10 +16,8 @@ tester:
     test_all_command: echo all tests
     test_command: |
       echo complicated command
-      echo testing $@
       for t in "$@"; do
         [ "$t" == "fail" ] && exit 1
         echo $t
       done
-    test_command_search_prefix: echo testing
     failed_log_list_command: ls
