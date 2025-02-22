@@ -1,0 +1,25 @@
+tester:
+  log_reader:
+    command: |
+      FAILED_LOG_LIST="$(mktemp)"
+      for l in "$@"; do
+        echo "$l" >> $FAILED_LOG_LIST
+      done
+      if [ "$#" -eq 1 ]; then
+        vim -c "let g:ctrlp_user_command='echo %s > /dev/null; cat $FAILED_LOG_LIST'" "$1"
+      else
+        vim -c "let g:ctrlp_user_command='echo %s > /dev/null; cat $FAILED_LOG_LIST'" +CtrlP
+      fi
+  tests:
+  - match_path_regex: .*
+    pre_test_command: echo pre test
+    test_all_command: echo all tests
+    test_command: |
+      echo complicated command
+      echo testing $@
+      for t in "$@"; do
+        [ "$t" == "fail" ] && exit 1
+        echo $t
+      done
+    test_command_search_prefix: echo testing
+    failed_log_list_command: ls
