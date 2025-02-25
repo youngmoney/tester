@@ -15,10 +15,6 @@ func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 	}
 	match := Match(cwd, tests)
 
-	fmt.Print("\n****************\n")
-	// Clear screen
-	fmt.Print("\033[H\033[2J")
-
 	if match.PreTestCommand != "" {
 		cmdErr := ExecuteCommandInteractive(match.PreTestCommand, []string{})
 		ExitIfNonZero(cmdErr)
@@ -70,6 +66,9 @@ func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 
 func commandLoop(args []string, all bool, tests *[]Test, log_reader *LogReader) {
 	for {
+		// Clear screen
+		fmt.Print("\033[H\033[2J")
+
 		err := commandTest(args, all, tests, log_reader)
 		if err == nil {
 			return
@@ -81,9 +80,7 @@ func commandLoop(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 }
 
 func main() {
-	configFilename := flag.String("config", os.Getenv("TESTER_CONFIG"), "config file (yaml)")
-	all := flag.Bool("a", false, "run all tests")
-	loop := flag.Bool("l", false, "run the test, show the logs, loop")
+	configFilename := flag.String("config", os.Getenv("TESTER_CONFIG"), "config file (yaml), or set TESTER_CONFIG")
 	flag.Parse()
 
 	config := ReadConfig(*configFilename)
@@ -92,6 +89,11 @@ func main() {
 		fmt.Println("test is the only supported command")
 		os.Exit(1)
 	}
+
+	fs := flag.NewFlagSet("test", flag.ExitOnError)
+	all := fs.Bool("a", false, "run all tests")
+	loop := fs.Bool("l", false, "run the test, show the logs, loop")
+	fs.Parse(flag.Args()[1:])
 
 	if *loop {
 		commandLoop(flag.Args()[1:], *all, &config.Tester.Tests, &config.Tester.LogReader)

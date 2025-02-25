@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"os"
 	"regexp"
 )
 
@@ -31,12 +33,14 @@ type Config struct {
 func ReadConfig(filename string) Config {
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		fmt.Println("unable to read config: ", filename)
+		os.Exit(1)
 	}
 
 	config := Config{}
 	if err := yaml.Unmarshal(raw, &config); err != nil {
-		panic(err)
+		fmt.Println("unable to parse config: ", filename)
+		os.Exit(1)
 	}
 
 	return config
