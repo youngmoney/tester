@@ -22,6 +22,14 @@ Test, Read Logs, Loop
 tester -l ...
 ```
 
+### Passing Arguments
+
+To pass flags to the underlying test, start the args with `--`
+
+``` bash
+tester -l test -- --test_flag test-arg
+```
+
 ## Config
 
 ``` yaml

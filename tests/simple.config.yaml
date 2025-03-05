@@ -1,0 +1,19 @@
+tester:
+  log_reader:
+    command: |
+      echo reading
+      for l in "$@"; do
+        echo "$l"
+      done
+      exit 1
+  tests:
+  - match_path_regex: .*
+    pre_test_command: echo pre test
+    test_all_command: echo all tests
+    test_command: |
+      echo complicated command
+      for t in "$@"; do
+        [ "$t" == "fail" ] && exit 1
+        echo $t
+      done
+    failed_log_list_command: echo failed.log

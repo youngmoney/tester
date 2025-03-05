@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) error {
+func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) (bool, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -38,7 +38,7 @@ func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 		testError = ExecuteCommandInteractive(match.TestCommand, args)
 	}
 	if testError == nil {
-		return nil
+		return false, nil
 	}
 
 	if match.FailedLogListCommand != "" {
@@ -54,13 +54,15 @@ func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 			logCmdError := ExecuteCommandInteractive(log_reader.Command, logFiles)
 			if logCmdError != nil {
 				fmt.Println("failed to read logs")
-				os.Exit(1)
+				return false, logCmdError
 			}
+
+			return true, testError
 		}
 
 	}
 
-	return testError
+	return false, testError
 
 }
 
@@ -69,13 +71,15 @@ func commandLoop(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 		// Clear screen
 		fmt.Print("\033[H\033[2J")
 
-		err := commandTest(args, all, tests, log_reader)
+		implicitContinue, err := commandTest(args, all, tests, log_reader)
 		if err == nil {
 			return
 		}
 
-		fmt.Print("\n\n[continue]")
-		fmt.Scanln()
+		if !implicitContinue {
+			fmt.Print("\n\n[continue]")
+			fmt.Scanln()
+		}
 	}
 }
 
@@ -95,10 +99,15 @@ func main() {
 	loop := fs.Bool("l", false, "run the test, show the logs, loop")
 	fs.Parse(flag.Args()[1:])
 
+	var args = fs.Args()
+	if len(args) > 0 && args[0] == "--" {
+		args = args[1:]
+	}
+
 	if *loop {
-		commandLoop(flag.Args()[1:], *all, &config.Tester.Tests, &config.Tester.LogReader)
+		commandLoop(args, *all, &config.Tester.Tests, &config.Tester.LogReader)
 	} else {
-		testError := commandTest(flag.Args()[1:], *all, &config.Tester.Tests, &config.Tester.LogReader)
+		_, testError := commandTest(args, *all, &config.Tester.Tests, &config.Tester.LogReader)
 		ExitIfNonZero(testError)
 	}
 }
