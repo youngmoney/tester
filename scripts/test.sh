@@ -12,3 +12,10 @@ diff <(run test -- -a b) <(echo pre test; echo complicated command; echo -a; ech
 diff <(run test -a -- b) <(echo pre test; echo all tests)
 diff <(run test -- -a -- b) <(echo pre test; echo complicated command; echo -a; echo --; echo b)
 diff <(run test a -- b) <(echo pre test; echo complicated command; echo a; echo --; echo b)
+
+function run() {
+	go run . --config tests/empty.config.yaml $@
+}
+
+diff <(run test a b) <(echo -n)
+diff <(run test -a a b) <(echo -n)

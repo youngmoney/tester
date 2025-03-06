@@ -15,6 +15,10 @@ func commandTest(args []string, all bool, tests *[]Test, log_reader *LogReader) 
 	}
 	match := Match(cwd, tests)
 
+	if match == nil {
+		return false, nil
+	}
+
 	if match.PreTestCommand != "" {
 		cmdErr := ExecuteCommandInteractive(match.PreTestCommand, []string{})
 		ExitIfNonZero(cmdErr)
